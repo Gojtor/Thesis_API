@@ -1,0 +1,6 @@
+@Thesis_ASP_HostAddress = http://localhost:5062
+
+GET {{Thesis_ASP_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
