@@ -24,6 +24,14 @@ public class TCGController : ControllerBase
         return Ok(card);
     }
 
+    [HttpGet("GetCardByCardID/{cardID}")]
+    public async Task<IActionResult> GetCardByCardID(string cardID)
+    {
+        Card? card = tcgDbContext.Cards.Where(x => x.cardID == cardID).Single();
+        if (card == null) { return NotFound(); }
+        return Ok(card);
+    }
+
     [HttpPost("SetCard")]
     public async Task<IActionResult> SetCard(string cardID, string cardName, string effect, int cost, int power, 
         int counter, string trigger, CardType cardType, CharacterType characterType, Attributes attribute, Colors color)

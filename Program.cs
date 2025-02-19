@@ -33,7 +33,7 @@ namespace Thesis_ASP
             using var scope = app.Services.CreateScope();
             var dbContext = scope.ServiceProvider.GetRequiredService<TCGDbContext>();
             dbContext.DeleteAllCards();
-            dbContext.Seed();
+            dbContext.AddCardsFromJSON();
             app.UseSwagger();
             app.UseSwaggerUI();
             app.MapControllers();

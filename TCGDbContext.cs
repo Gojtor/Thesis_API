@@ -30,7 +30,7 @@ namespace Thesis_ASP
         {
             
         }
-        public void Seed()
+        public void AddCardsFromJSON()
         {
             if (!Cards.Any())
             {
