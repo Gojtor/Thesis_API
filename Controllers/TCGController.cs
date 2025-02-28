@@ -53,4 +53,40 @@ public class TCGController : ControllerBase
         await tcgDbContext.SaveChangesAsync();
         return Ok(card);
     }
+
+    [HttpGet("GetCardByFromGameDB")]
+    public async Task<IActionResult> GetCardByFromGameDB(string gameCustomID, string playerName, string cardCustomID)
+    {
+        InGameCards? card = tcgDbContext.InGameCards.Where(x => x.gameCustomID==gameCustomID && x.playerName==playerName && x.customCardID == cardCustomID).Single();
+        if (card == null) { return NotFound(); }
+        return Ok(card);
+    }
+
+    [HttpPost("SetCardToGameDB")]
+    public async Task<IActionResult> SetCardToGameDB(string cardID, string cardName, string effect, int cost, int power,
+        int counter, string trigger, CardType cardType, CharacterType characterType, Attributes attribute, Colors color,
+        bool active, string customCardID, string playerName, string gameCustomID)
+    {
+        InGameCards card = new InGameCards()
+        {
+            cardID = cardID,
+            cardName = cardName,
+            effect = effect,
+            cost = cost,
+            power = power,
+            counter = counter,
+            trigger = trigger,
+            cardType = cardType,
+            characterType = characterType,
+            attribute = attribute,
+            color = color,
+            active= active,
+            customCardID= customCardID,
+            playerName= playerName,
+            gameCustomID= gameCustomID
+        };
+        tcgDbContext.InGameCards.Add(card);
+        await tcgDbContext.SaveChangesAsync();
+        return Ok(card);
+    }
 }

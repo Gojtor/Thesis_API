@@ -16,12 +16,14 @@ using Newtonsoft.Json.Serialization;
 using Thesis_ASP.Resources;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Threading.Tasks;
 
 namespace Thesis_ASP
 {
     public class TCGDbContext : DbContext
     {
         public DbSet<Card> Cards { get; set; }
+        public DbSet<InGameCards> InGameCards { get; set; }
         public TCGDbContext(DbContextOptions<TCGDbContext> options) : base(options)
         {
 
@@ -30,7 +32,7 @@ namespace Thesis_ASP
         {
             
         }
-        public void AddCardsFromJSON()
+        public async Task AddCardsFromJSON()
         {
             if (!Cards.Any())
             {
@@ -51,9 +53,8 @@ namespace Thesis_ASP
                         Console.WriteLine("The JSON file is wrong");
                         return;
                     }
-
-                    AddRange(cards);
-                    SaveChanges();
+                    await AddRangeAsync(cards);
+                    await SaveChangesAsync();
                     Console.WriteLine("JSON loaded to database succesfully");
                 }
                 catch (Exception ex)
@@ -62,13 +63,13 @@ namespace Thesis_ASP
                 }
             }
         }
-        public void DeleteAllCards()
+        public async void DeleteAllCards()
         {
             try
             {
                 var allCards = Cards.ToList();
                 Cards.RemoveRange(allCards);
-                SaveChanges();
+                await SaveChangesAsync();
                 Console.WriteLine("Database cleared");
             }
             catch (Exception ex)
