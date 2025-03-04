@@ -69,6 +69,13 @@ public class TCGController : ControllerBase
         return Ok(tcgDbContext.InGameCards);
     }
 
+    [HttpGet("GetCardCountFromGameDB")]
+    public async Task<IActionResult> GetCardCountFromGameDB()
+    {
+        if (tcgDbContext.InGameCards == null) { return NotFound(); }
+        return Ok(tcgDbContext.InGameCards.Count());
+    }
+
     [HttpPost("SetCardToGameDB")]
     public async Task<IActionResult> SetCardToGameDB([FromBody] InGameCard card)
     {
