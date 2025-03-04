@@ -3,7 +3,7 @@ using Thesis_ASP.Resources;
 
 namespace Thesis_ASP
 {
-    public class InGameCards
+    public class InGameCard
     {
         //Card Data-s
         public string cardID { get; set; }
@@ -23,7 +23,8 @@ namespace Thesis_ASP
         //Game Data-s
         public string playerName { get; set; }
         public string gameCustomID { get; set; }
+        public string currentParent { get; set; }
         [Key]
-        public int gameID { get; set; }
+        public long id { get; set; }
     }
 }

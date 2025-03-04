@@ -11,8 +11,8 @@ using Thesis_ASP;
 namespace Thesis_ASP.Migrations
 {
     [DbContext(typeof(TCGDbContext))]
-    [Migration("20250218162728_AddAttributeColumn")]
-    partial class AddAttributeColumn
+    [Migration("20250303212049_InitialMigration")]
+    partial class InitialMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -71,24 +71,72 @@ namespace Thesis_ASP.Migrations
 
                     b.HasKey("id");
 
-                    b.ToTable("cards");
+                    b.ToTable("Cards", (string)null);
+                });
 
-                    b.HasData(
-                        new
-                        {
-                            id = 2L,
-                            attribute = 0,
-                            cardID = "ST01-002",
-                            cardName = "Usopp",
-                            cardType = 0,
-                            characterType = 0,
-                            color = 4,
-                            cost = 2,
-                            counter = 1000,
-                            effect = "effect",
-                            power = 2000,
-                            trigger = "trigger"
-                        });
+            modelBuilder.Entity("Thesis_ASP.InGameCard", b =>
+                {
+                    b.Property<long>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("id"));
+
+                    b.Property<bool>("active")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<int>("attribute")
+                        .HasColumnType("int");
+
+                    b.Property<string>("cardID")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("cardName")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("cardType")
+                        .HasColumnType("int");
+
+                    b.Property<int>("characterType")
+                        .HasColumnType("int");
+
+                    b.Property<int>("color")
+                        .HasColumnType("int");
+
+                    b.Property<int>("cost")
+                        .HasColumnType("int");
+
+                    b.Property<int>("counter")
+                        .HasColumnType("int");
+
+                    b.Property<string>("customCardID")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("effect")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("gameCustomID")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("playerName")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("power")
+                        .HasColumnType("int");
+
+                    b.Property<string>("trigger")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("id");
+
+                    b.ToTable("InGameCards", (string)null);
                 });
 #pragma warning restore 612, 618
         }

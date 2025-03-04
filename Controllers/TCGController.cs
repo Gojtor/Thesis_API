@@ -57,17 +57,38 @@ public class TCGController : ControllerBase
     [HttpGet("GetCardByFromGameDB")]
     public async Task<IActionResult> GetCardByFromGameDB(string gameCustomID, string playerName, string cardCustomID)
     {
-        InGameCards? card = tcgDbContext.InGameCards.Where(x => x.gameCustomID==gameCustomID && x.playerName==playerName && x.customCardID == cardCustomID).Single();
+        InGameCard? card = tcgDbContext.InGameCards.Where(x => x.gameCustomID==gameCustomID && x.playerName==playerName && x.customCardID == cardCustomID).Single();
         if (card == null) { return NotFound(); }
         return Ok(card);
     }
 
+    [HttpGet("GetAllCardByFromGameDB")]
+    public async Task<IActionResult> GetAllCardByFromGameDB()
+    {
+        if (tcgDbContext.InGameCards == null) { return NotFound(); }
+        return Ok(tcgDbContext.InGameCards);
+    }
+
     [HttpPost("SetCardToGameDB")]
-    public async Task<IActionResult> SetCardToGameDB(string cardID, string cardName, string effect, int cost, int power,
+    public async Task<IActionResult> SetCardToGameDB([FromBody] InGameCard card)
+    {
+        if (card == null)
+        {
+            Console.WriteLine("Érvénytelen JSON adat!"); // Log konzolba
+            return BadRequest("Érvénytelen JSON adat!");
+        }
+        Console.WriteLine($"Kapott kártya: {card.cardName} - ID: {card.cardID}");
+        tcgDbContext.InGameCards.Add(card);
+        await tcgDbContext.SaveChangesAsync();
+        return Ok(card);
+    }
+
+    [HttpPost("SetCardToGameDBNoJSON")]
+    public async Task<IActionResult> SetCardToGameDBNoJSON(string cardID, string cardName, string effect, int cost, int power,
         int counter, string trigger, CardType cardType, CharacterType characterType, Attributes attribute, Colors color,
         bool active, string customCardID, string playerName, string gameCustomID)
     {
-        InGameCards card = new InGameCards()
+        InGameCard card = new InGameCard()
         {
             cardID = cardID,
             cardName = cardName,
@@ -80,10 +101,10 @@ public class TCGController : ControllerBase
             characterType = characterType,
             attribute = attribute,
             color = color,
-            active= active,
-            customCardID= customCardID,
-            playerName= playerName,
-            gameCustomID= gameCustomID
+            active = active,
+            customCardID = customCardID,
+            playerName = playerName,
+            gameCustomID = gameCustomID
         };
         tcgDbContext.InGameCards.Add(card);
         await tcgDbContext.SaveChangesAsync();

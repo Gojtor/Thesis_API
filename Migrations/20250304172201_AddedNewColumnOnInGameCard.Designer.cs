@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Thesis_ASP;
 
@@ -10,9 +11,11 @@ using Thesis_ASP;
 namespace Thesis_ASP.Migrations
 {
     [DbContext(typeof(TCGDbContext))]
-    partial class TCGDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250304172201_AddedNewColumnOnInGameCard")]
+    partial class AddedNewColumnOnInGameCard
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

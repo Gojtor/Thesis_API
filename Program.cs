@@ -12,7 +12,7 @@ namespace Thesis_ASP
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
             builder.Services.AddEndpointsApiExplorer();
@@ -32,8 +32,9 @@ namespace Thesis_ASP
             }
             using var scope = app.Services.CreateScope();
             var dbContext = scope.ServiceProvider.GetRequiredService<TCGDbContext>();
-            dbContext.DeleteAllCards();
-            dbContext.AddCardsFromJSON();
+            await dbContext.DeleteAllCards();
+            await dbContext.DeleteAllInGameCards();
+            await dbContext.AddCardsFromJSON();     
             app.UseSwagger();
             app.UseSwaggerUI();
             app.MapControllers();

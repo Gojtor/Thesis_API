@@ -22,15 +22,17 @@ namespace Thesis_ASP
 {
     public class TCGDbContext : DbContext
     {
-        public DbSet<Card> Cards { get; set; }
-        public DbSet<InGameCards> InGameCards { get; set; }
         public TCGDbContext(DbContextOptions<TCGDbContext> options) : base(options)
         {
 
         }
+        public DbSet<Card> Cards { get; set; }
+        public DbSet<InGameCard> InGameCards { get; set; }
+        
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            
+            modelBuilder.Entity<Card>().ToTable("Cards");
+            modelBuilder.Entity<InGameCard>().ToTable("InGameCards");
         }
         public async Task AddCardsFromJSON()
         {
@@ -63,14 +65,29 @@ namespace Thesis_ASP
                 }
             }
         }
-        public async void DeleteAllCards()
+        public async Task DeleteAllCards()
         {
             try
             {
                 var allCards = Cards.ToList();
                 Cards.RemoveRange(allCards);
                 await SaveChangesAsync();
-                Console.WriteLine("Database cleared");
+                Console.WriteLine("Cards table cleared");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Erro while clearing database: {ex.Message}");
+            }
+        }
+
+        public async Task DeleteAllInGameCards()
+        {
+            try
+            {
+                var allInGameCards = InGameCards.ToList();
+                InGameCards.RemoveRange(allInGameCards);
+                await SaveChangesAsync();
+                Console.WriteLine("InGameCards table cleared");
             }
             catch (Exception ex)
             {
