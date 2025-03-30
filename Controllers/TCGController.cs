@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Thesis_ASP.Resources;
 
@@ -69,11 +70,30 @@ public class TCGController : ControllerBase
         return Ok(tcgDbContext.InGameCards);
     }
 
+    [HttpGet("GetAllCardByFromGameDBByGameID")]
+    public async Task<IActionResult> GetAllCardByFromGameDBByGameID(string gameCustomID)
+    {
+        List<InGameCard> cards = tcgDbContext.InGameCards.Where(x => x.gameCustomID == gameCustomID).ToList();
+        if (cards == null) { return NotFound(); }
+        return Ok(cards);
+    }
+
     [HttpGet("GetCardCountFromGameDB")]
     public async Task<IActionResult> GetCardCountFromGameDB()
     {
         if (tcgDbContext.InGameCards == null) { return NotFound(); }
-        return Ok(tcgDbContext.InGameCards.Count());
+        string deckCount=tcgDbContext.InGameCards.Where(x => x.currentParent.Contains("Deck")).Count().ToString();
+        string handCount=tcgDbContext.InGameCards.Where(x => x.currentParent.Contains("Hand")).Count().ToString();
+        string lifeCount=tcgDbContext.InGameCards.Where(x => x.currentParent.Contains("Life")).Count().ToString();
+        return Ok("All cards: "+tcgDbContext.InGameCards.Count()+"\nDeck cards count: "+ deckCount + ", Hand cards count: "+handCount+", Life cards count: "+ lifeCount);
+    }
+
+    [HttpGet("DeleteCardsFromGameDB")]
+    public async Task<IActionResult> DeleteCardsFromGameDB()
+    {
+        if (tcgDbContext.InGameCards == null) { return NotFound(); }
+        await tcgDbContext.DeleteAllInGameCards();
+        return Ok("Cards deleted from GameDB");
     }
 
     [HttpPost("SetCardToGameDB")]
@@ -116,5 +136,19 @@ public class TCGController : ControllerBase
         tcgDbContext.InGameCards.Add(card);
         await tcgDbContext.SaveChangesAsync();
         return Ok(card);
+    }
+
+    [HttpPost("SetEnemyCardsToGameDBNoJSON")]
+    public async Task<IActionResult> SetEnemyCardsToGameDBNoJSON()
+    {
+        await tcgDbContext.AddEnemyCardsFromJSON();
+        return Ok();
+    }
+
+    [HttpPost("EnemyConnectedTest")]
+    public async Task<IActionResult> EnemyConnectedTest(string gameID)
+    {
+        await tcgDbContext.SendEnemyConnectedToClient(gameID);
+        return Ok();
     }
 }

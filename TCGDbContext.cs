@@ -22,9 +22,11 @@ namespace Thesis_ASP
 {
     public class TCGDbContext : DbContext
     {
-        public TCGDbContext(DbContextOptions<TCGDbContext> options) : base(options)
-        {
+        private readonly IHubContext<WebSocket> webSocket;
 
+        public TCGDbContext(DbContextOptions<TCGDbContext> options, IHubContext<WebSocket> webSocket) : base(options)
+        {
+            this.webSocket = webSocket;
         }
         public DbSet<Card> Cards { get; set; }
         public DbSet<InGameCard> InGameCards { get; set; }
@@ -65,6 +67,36 @@ namespace Thesis_ASP
                 }
             }
         }
+
+        public async Task AddEnemyCardsFromJSON()
+        {
+                try
+                {
+                    var jsonPath = Path.Combine(Directory.GetCurrentDirectory(), "Resources", "enemyCards.json");
+                    if (!File.Exists(jsonPath))
+                    {
+                        Console.WriteLine("Couldn't locate JSON file.");
+                        return;
+                    }
+
+                    string jsonString = File.ReadAllText(jsonPath);
+
+                    List<InGameCard> inGameCards = JsonConvert.DeserializeObject<List<InGameCard>>(jsonString);
+                    if (inGameCards == null || !inGameCards.Any())
+                    {
+                        Console.WriteLine("The JSON file is wrong");
+                        return;
+                    }
+                    await AddRangeAsync(inGameCards);
+                    await SaveChangesAsync();
+                    Console.WriteLine("JSON loaded to database succesfully");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error while loading JSON: {ex.Message}");
+                }
+        }
+
         public async Task DeleteAllCards()
         {
             try
@@ -94,5 +126,16 @@ namespace Thesis_ASP
                 Console.WriteLine($"Erro while clearing database: {ex.Message}");
             }
         }
+
+        public async Task SendMessageToClient(string gameID)
+        {
+            await webSocket.Clients.Group(gameID).SendAsync("ReceiveMessage", "Message: TEST FROM API");
+        }
+
+        public async Task SendEnemyConnectedToClient(string gameID)
+        {
+            await webSocket.Clients.Group(gameID).SendAsync("EnemyConnected", "Message: ENEMYCONNECTED FROM API");
+        }
+
     }
 }

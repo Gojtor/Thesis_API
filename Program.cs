@@ -7,6 +7,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.OpenApi.Models;
 using System;
+using System.Threading.Tasks;
 
 namespace Thesis_ASP
 {
@@ -15,6 +16,7 @@ namespace Thesis_ASP
         public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+            builder.Services.AddSignalR();
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
             builder.Services.AddControllers();
@@ -38,6 +40,12 @@ namespace Thesis_ASP
             app.UseSwagger();
             app.UseSwaggerUI();
             app.MapControllers();
+            app.UseRouting();
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapHub<WebSocket>("/websocket");
+                endpoints.MapControllers();
+            });
             app.Run();
         }
     }
