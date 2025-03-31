@@ -9,6 +9,7 @@ namespace Thesis_ASP
         {
             await Groups.AddToGroupAsync(Context.ConnectionId, gameID);
             Console.WriteLine("Player: "+name+" added to the game with the following ID: "+gameID);
+            await Task.Delay(3000);
             await Clients.Group(gameID).SendAsync("AddedToClient", "Player: " + name + " added to the game with the following ID: " + gameID);
         }
 
