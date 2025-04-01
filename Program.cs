@@ -20,6 +20,7 @@ namespace Thesis_ASP
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
             builder.Services.AddControllers();
+            builder.Services.AddSingleton<GameGroupManager>();
             builder.Services.AddDbContext<TCGDbContext>(options =>
             options.UseMySql("Server=localhost;Port=3306;Database=egy_darab;User=lorxy;Password=lorand;",
             new MySqlServerVersion(new Version(10, 5, 9))

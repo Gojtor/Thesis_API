@@ -78,6 +78,14 @@ public class TCGController : ControllerBase
         return Ok(cards);
     }
 
+    [HttpGet("GetAllCardByFromGameDBByGameIDAndPlayer")]
+    public async Task<IActionResult> GetAllCardByFromGameDBByGameIDAndPlayer(string gameCustomID,string playerName)
+    {
+        List<InGameCard> cards = tcgDbContext.InGameCards.Where(x => x.gameCustomID == gameCustomID && x.playerName==playerName).ToList();
+        if (cards == null) { return NotFound(); }
+        return Ok(cards);
+    }
+
     [HttpGet("GetCardCountFromGameDB")]
     public async Task<IActionResult> GetCardCountFromGameDB()
     {

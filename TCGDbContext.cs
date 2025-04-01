@@ -134,7 +134,7 @@ namespace Thesis_ASP
 
         public async Task SendEnemyConnectedToClient(string gameID)
         {
-            await webSocket.Clients.Group(gameID).SendAsync("EnemyConnected", "Message: ENEMYCONNECTED FROM API");
+            await webSocket.Clients.Group(gameID).SendAsync("EnemyConnected", "Message: ENEMYCONNECTED FROM API","API_ENEMY");
         }
 
     }
