@@ -36,8 +36,6 @@ namespace Thesis_ASP
                 await Groups.AddToGroupAsync(Context.ConnectionId, gameID);
                 Console.WriteLine("Player: " + name + " added to the game with the following ID: " + gameID + " GROUPS COUNT: " + groupManager.Groups.Count);
                 await Clients.Caller.SendAsync("AddedToGroup", "The player is added to the group");
-                await Task.Delay(3000);
-                await Clients.OthersInGroup(gameID).SendAsync("EnemyConnected", "Player: " + name + " added to the game with the following ID: " + gameID,name);
             }
                 
         }
@@ -55,7 +53,6 @@ namespace Thesis_ASP
                 groupManager.Groups[gameID].Add(name);
                 await Groups.AddToGroupAsync(Context.ConnectionId, gameID);
                 Console.WriteLine("Player: " + name + " added to the game with the following ID: " + gameID+" GROUPS COUNT: "+ groupManager.Groups.Count);
-                await Task.Delay(3000);
                 await Clients.Caller.SendAsync("GameGroupCreated", "Player: " + name + " created game with the following ID: " + gameID);
             } 
         }
@@ -66,16 +63,30 @@ namespace Thesis_ASP
             await Clients.Group(gameID).SendAsync("ReceiveMessage", "Message: "+message+" received from client");
         }
 
-        public async Task ReAssureEnemyConnected(string gameID)
+        public async Task ReAssureEnemyConnected(string gameID,string name)
         {
             Console.WriteLine("Enemy connected to my game: "+gameID + " GROUPS COUNT: " + groupManager.Groups.Count);
-            await Clients.Others.SendAsync("Connected", "Connected to the game");
+            await Clients.Others.SendAsync("Connected", "The following player connected to the game: ",name);
         }
 
         public async Task DoneWithMulliganOrKeep(string gameID)
         {
             Console.WriteLine("Done with mulligan");
-            await Clients.Others.SendAsync("DoneWithStartingHand", "Done to the mulligan or keeping hand");
+            await Clients.OthersInGroup(gameID).SendAsync("DoneWithStartingHand", "Done to the mulligan or keeping hand");
+        }
+
+        public async Task UpdateMyBoardAtEnemy(string gameID)
+        {
+            await Clients.OthersInGroup(gameID).SendAsync("UpdateEnemyBoard", "Update enemy board!");
+        }
+
+        public async Task ConnectedAsEnemy(string gameID, string name)
+        {
+            await Clients.OthersInGroup(gameID).SendAsync("EnemyConnected", "Player: " + name + " added to the game with the following ID: " + gameID,name);
+        }
+        public async Task UpdateMyCardAtEnemy(string gameID,string customCardID)
+        {
+            await Clients.OthersInGroup(gameID).SendAsync("UpdateThisEnemyCard", customCardID);
         }
     }
 }

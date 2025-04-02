@@ -1,6 +1,13 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.Extensions.Hosting;
+using Microsoft.VisualBasic;
+using System.Diagnostics.Metrics;
+using System.Drawing;
+using System;
+using System.Net.WebSockets;
 using Thesis_ASP.Resources;
 
 namespace Thesis_ASP.Controllers;
@@ -86,6 +93,14 @@ public class TCGController : ControllerBase
         return Ok(cards);
     }
 
+    [HttpGet("GetCardByFromGameDBByGameIDAndPlayerAndCustomCardID")]
+    public async Task<IActionResult> GetCardByFromGameDBByGameIDAndPlayerAndCustomCardID(string gameCustomID, string playerName,string customCardID)
+    {
+        var card = await tcgDbContext.InGameCards.Where(x => x.gameCustomID == gameCustomID && x.playerName == playerName && x.customCardID==customCardID).SingleOrDefaultAsync();
+        if (card == null) { return NotFound(); }
+        return Ok(card);
+    }
+
     [HttpGet("GetCardCountFromGameDB")]
     public async Task<IActionResult> GetCardCountFromGameDB()
     {
@@ -158,5 +173,35 @@ public class TCGController : ControllerBase
     {
         await tcgDbContext.SendEnemyConnectedToClient(gameID);
         return Ok();
+    }
+
+    [HttpPost("UpdateCardInGameDB")]
+    public async Task<IActionResult> UpdateCardInGameDB([FromBody] InGameCard updatedCard)
+    {
+        var card = await tcgDbContext.InGameCards
+            .Where(x => x.gameCustomID == updatedCard.gameCustomID && x.playerName == updatedCard.playerName && x.customCardID == updatedCard.customCardID)
+            .SingleOrDefaultAsync();
+        if (card == null)
+        {
+            return NotFound();
+        }
+        card.cardID = updatedCard.cardID;
+        card.cardName = updatedCard.cardName;
+        card.effect = updatedCard.effect;
+        card.cost = updatedCard.cost;
+        card.power = updatedCard.power;
+        card.counter = updatedCard.counter;
+        card.trigger = updatedCard.trigger;
+        card.cardType = updatedCard.cardType;
+        card.characterType = updatedCard.characterType;
+        card.attribute = updatedCard.attribute;
+        card.color = updatedCard.color;
+        card.active = updatedCard.active;
+        card.customCardID = updatedCard.customCardID;
+        card.playerName = updatedCard.playerName;
+        card.gameCustomID = updatedCard.gameCustomID;
+        card.currentParent = updatedCard.currentParent;
+        await tcgDbContext.SaveChangesAsync();
+        return Ok(card);
     }
 }
