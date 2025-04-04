@@ -66,7 +66,10 @@ namespace Thesis_ASP
         public async Task ReAssureEnemyConnected(string gameID,string name)
         {
             Console.WriteLine("Enemy connected to my game: "+gameID + " GROUPS COUNT: " + groupManager.Groups.Count);
-            await Clients.Others.SendAsync("Connected", "The following player connected to the game: ",name);
+            await Clients.OthersInGroup(gameID).SendAsync("Connected", "The following player connected to the game: ", name);
+            Random random = new Random();
+            string whoIsFirst =groupManager.Groups[gameID][random.Next(0, 2)];
+            await Clients.Group(gameID).SendAsync("WhoIsFirst",whoIsFirst);
         }
 
         public async Task DoneWithMulliganOrKeep(string gameID)
@@ -86,7 +89,14 @@ namespace Thesis_ASP
         }
         public async Task UpdateMyCardAtEnemy(string gameID,string customCardID)
         {
+            Console.WriteLine("Update this card: " + customCardID);
             await Clients.OthersInGroup(gameID).SendAsync("UpdateThisEnemyCard", customCardID);
+        }
+
+        public async Task ChangeEnemyGameStateToPlayerPhase(string gameID)
+        {
+            Console.WriteLine("SWITCHING PHASES!");
+            await Clients.OthersInGroup(gameID).SendAsync("ChangeGameStateToPlayerPhase","Changing game phases!");
         }
     }
 }

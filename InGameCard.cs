@@ -17,6 +17,7 @@ namespace Thesis_ASP
         public CharacterType characterType { get; set; }
         public Attributes attribute { get; set; }
         public Colors color { get; set; }
+        public CardVisibility cardVisibility { get; set; } = CardVisibility.NONE;
         public bool active { get; set; }
         public string customCardID { get; set; } //This is needed when there is more than 1 from the same card in the deck
 

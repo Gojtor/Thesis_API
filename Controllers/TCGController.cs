@@ -197,6 +197,7 @@ public class TCGController : ControllerBase
         card.attribute = updatedCard.attribute;
         card.color = updatedCard.color;
         card.active = updatedCard.active;
+        card.cardVisibility = updatedCard.cardVisibility;
         card.customCardID = updatedCard.customCardID;
         card.playerName = updatedCard.playerName;
         card.gameCustomID = updatedCard.gameCustomID;
