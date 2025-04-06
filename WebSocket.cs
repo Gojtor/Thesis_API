@@ -107,15 +107,14 @@ namespace Thesis_ASP
 
         public async Task AttackedEnemyCard(string gameID,string cardThatAttacksID, string attackedCard, int power)
         {
-            Console.WriteLine("Battle started");
             Console.WriteLine("Card: " + cardThatAttacksID +" with this power: "+power+" attacked this card: "+attackedCard);
             await Clients.OthersInGroup(gameID).SendAsync("MyCardIsAttacked", cardThatAttacksID,attackedCard,power);
         }
 
-        public async Task BattleEnded(string gameID)
+        public async Task BattleEnded(string gameID,string attackerID,string attackedID)
         {
-            Console.WriteLine("Battle ended");
-            await Clients.OthersInGroup(gameID).SendAsync("BattleEnded", "The battle ended");
+            Console.WriteLine("The battle ended between attacker: " + attackerID + " and attacked: " + attackedID);
+            await Clients.OthersInGroup(gameID).SendAsync("BattleEnded", "The battle ended between attacker: "+attackerID+" and attacked: "+attackedID);
         }
     }
 }
