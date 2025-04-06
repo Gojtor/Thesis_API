@@ -98,5 +98,24 @@ namespace Thesis_ASP
             Console.WriteLine("SWITCHING PHASES!");
             await Clients.OthersInGroup(gameID).SendAsync("ChangeGameStateToPlayerPhase","Changing game phases!");
         }
+
+        public async Task UpdateMyLeaderCardAtEnemy(string gameID, string customCardID)
+        {
+            Console.WriteLine("Update this card: " + customCardID);
+            await Clients.OthersInGroup(gameID).SendAsync("UpdateEnemyLeaderCard", customCardID);
+        }
+
+        public async Task AttackedEnemyCard(string gameID,string cardThatAttacksID, string attackedCard, int power)
+        {
+            Console.WriteLine("Battle started");
+            Console.WriteLine("Card: " + cardThatAttacksID +" with this power: "+power+" attacked this card: "+attackedCard);
+            await Clients.OthersInGroup(gameID).SendAsync("MyCardIsAttacked", cardThatAttacksID,attackedCard,power);
+        }
+
+        public async Task BattleEnded(string gameID)
+        {
+            Console.WriteLine("Battle ended");
+            await Clients.OthersInGroup(gameID).SendAsync("BattleEnded", "The battle ended");
+        }
     }
 }
