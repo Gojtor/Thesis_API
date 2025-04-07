@@ -69,6 +69,7 @@ namespace Thesis_ASP
             await Clients.OthersInGroup(gameID).SendAsync("Connected", "The following player connected to the game: ", name);
             Random random = new Random();
             string whoIsFirst =groupManager.Groups[gameID][random.Next(0, 2)];
+            Console.WriteLine("First player is: "+whoIsFirst);
             await Clients.Group(gameID).SendAsync("WhoIsFirst",whoIsFirst);
         }
 
