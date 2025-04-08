@@ -117,5 +117,17 @@ namespace Thesis_ASP
             Console.WriteLine("The battle ended between attacker: " + attackerID + " and attacked: " + attackedID);
             await Clients.OthersInGroup(gameID).SendAsync("BattleEnded", "The battle ended between attacker: "+attackerID+" and attacked: "+attackedID);
         }
+
+        public async Task EnemyWon(string gameID)
+        {
+            Console.WriteLine("Someone won!");
+            await Clients.OthersInGroup(gameID).SendAsync("YouWon", "You won the game!");
+        }
+
+        public async Task EnemyLost(string gameID)
+        {
+            Console.WriteLine("Someone won!");
+            await Clients.OthersInGroup(gameID).SendAsync("YouLost", "You lost the game!");
+        }
     }
 }
