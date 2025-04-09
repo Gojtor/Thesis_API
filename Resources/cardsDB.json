@@ -17070,7 +17070,7 @@
         "cardID": "ST01-001",
         "cardName": "Monkey.D.Luffy",
         "effect": "[Activate: Main] [Once Per Turn] Give this Leader or 1 of your Characters up to 1 rested DON!! card.",
-        "cost": 1,
+        "cost": 5,
         "power": 5000,
         "counter": 0,
         "trigger": "0",

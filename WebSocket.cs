@@ -115,7 +115,7 @@ namespace Thesis_ASP
         public async Task BattleEnded(string gameID,string attackerID,string attackedID)
         {
             Console.WriteLine("The battle ended between attacker: " + attackerID + " and attacked: " + attackedID);
-            await Clients.OthersInGroup(gameID).SendAsync("BattleEnded", "The battle ended between attacker: "+attackerID+" and attacked: "+attackedID);
+            await Clients.OthersInGroup(gameID).SendAsync("BattleEnded", "The battle ended between attacker: "+attackerID+" and attacked: "+attackedID, attackedID);
         }
 
         public async Task EnemyWon(string gameID)
@@ -128,6 +128,12 @@ namespace Thesis_ASP
         {
             Console.WriteLine("Someone won!");
             await Clients.OthersInGroup(gameID).SendAsync("YouLost", "You lost the game!");
+        }
+
+        public async Task AddPlusPowerFromCounter(string gameID, string toCardID, string counterCardID)
+        {
+            Console.WriteLine("Enemy used counter card: "+ counterCardID);
+            await Clients.OthersInGroup(gameID).SendAsync("AddPlusPowerToCardFromCounter", toCardID,counterCardID);
         }
     }
 }
