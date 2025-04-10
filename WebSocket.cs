@@ -20,7 +20,7 @@ namespace Thesis_ASP
                 await Clients.Caller.SendAsync("GroupDoesntExist", "Game with this ID doesnt exists");
                 Console.WriteLine("Game with this ID doesnt exists, ID: "+gameID);
             }
-            if (groupManager.Groups[gameID].Contains(name))
+            else if (groupManager.Groups[gameID].Contains(name))
             {
                 await Clients.Caller.SendAsync("PlayerAlreadyInThisGroup", "A player with this name already in game");
                 Console.WriteLine("A player with this name already in game, player name: "+ name+" , game id: "+gameID);
@@ -106,10 +106,10 @@ namespace Thesis_ASP
             await Clients.OthersInGroup(gameID).SendAsync("UpdateEnemyLeaderCard", customCardID);
         }
 
-        public async Task AttackedEnemyCard(string gameID,string cardThatAttacksID, string attackedCard, int power)
+        public async Task AttackedEnemyCard(string gameID,string cardThatAttacksID, string attackedCard, int power, bool thereIsWhenAttacking)
         {
             Console.WriteLine("Card: " + cardThatAttacksID +" with this power: "+power+" attacked this card: "+attackedCard);
-            await Clients.OthersInGroup(gameID).SendAsync("MyCardIsAttacked", cardThatAttacksID,attackedCard,power);
+            await Clients.OthersInGroup(gameID).SendAsync("MyCardIsAttacked", cardThatAttacksID,attackedCard,power, thereIsWhenAttacking);
         }
 
         public async Task BattleEnded(string gameID,string attackerID,string attackedID)
@@ -134,6 +134,23 @@ namespace Thesis_ASP
         {
             Console.WriteLine("Enemy used counter card: "+ counterCardID);
             await Clients.OthersInGroup(gameID).SendAsync("AddPlusPowerToCardFromCounter", toCardID,counterCardID);
+        }
+
+        public async Task EnemyCantActivateBlockerOver(string gameID, string effectInvokerID, int overThis)
+        {
+            Console.WriteLine("Enemy character: " + effectInvokerID+" used When attacking effect!");
+            await Clients.OthersInGroup(gameID).SendAsync("ICantActivateBlockerOverThis", effectInvokerID, overThis);
+        }
+
+        public async Task AddPlusPowerToCardFromEffectForThisTurn(string gameID, string fromCardID, string toCardID, int plusPower)
+        {
+            Console.WriteLine("Enemy character: " + fromCardID + " used effect to add plus "+plusPower+" power to this card: "+toCardID);
+            await Clients.OthersInGroup(gameID).SendAsync("AddPlusPowerToCardFromEffectForThisTurn", fromCardID, toCardID,plusPower);
+        }
+
+        public async Task ImDoneWithWhenAttackingEffect(string gameID)
+        {
+            await Clients.OthersInGroup(gameID).SendAsync("EnemyDoneWithWhenAttackingEffect","Enemy done with when attacking effect!");
         }
     }
 }
