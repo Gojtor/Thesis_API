@@ -152,5 +152,11 @@ namespace Thesis_ASP
         {
             await Clients.OthersInGroup(gameID).SendAsync("EnemyDoneWithWhenAttackingEffect","Enemy done with when attacking effect!");
         }
+
+        public async Task ReceivedtAttackDeclaration(string gameID)
+        {
+            Console.WriteLine("Enemy received attack declaration");
+            await Clients.OthersInGroup(gameID).SendAsync("EnemyGotAttackDeclaration", "Enemy Got Attack Declaration!");
+        }
     }
 }
