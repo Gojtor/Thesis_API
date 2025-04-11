@@ -130,10 +130,10 @@ namespace Thesis_ASP
             await Clients.OthersInGroup(gameID).SendAsync("YouLost", "You lost the game!");
         }
 
-        public async Task AddPlusPowerFromCounter(string gameID, string toCardID, string counterCardID)
+        public async Task AddPlusPowerFromCounter(string gameID, string toCardID, string counterCardID, int counterValue)
         {
             Console.WriteLine("Enemy used counter card: "+ counterCardID);
-            await Clients.OthersInGroup(gameID).SendAsync("AddPlusPowerToCardFromCounter", toCardID,counterCardID);
+            await Clients.OthersInGroup(gameID).SendAsync("AddPlusPowerToCardFromCounter", toCardID,counterCardID, counterValue);
         }
 
         public async Task EnemyCantActivateBlockerOver(string gameID, string effectInvokerID, int overThis)
@@ -157,6 +157,12 @@ namespace Thesis_ASP
         {
             Console.WriteLine("Enemy received attack declaration");
             await Clients.OthersInGroup(gameID).SendAsync("EnemyGotAttackDeclaration", "Enemy Got Attack Declaration!");
+        }
+
+        public async Task KoThisCard(string gameID, string koThisID, string effectCallerID)
+        {
+            Console.WriteLine("Enemy K.O.-ed this card: "+koThisID);
+            await Clients.OthersInGroup(gameID).SendAsync("KoThisCard", "Enemy K.O.-ed this card: " + koThisID,koThisID,effectCallerID);
         }
     }
 }
