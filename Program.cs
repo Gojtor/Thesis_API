@@ -15,6 +15,7 @@ namespace Thesis_ASP
     {
         public static async Task Main(string[] args)
         {
+            string dbHost = Environment.GetEnvironmentVariable("DB_HOST") ?? "localhost";
             var builder = WebApplication.CreateBuilder(args);
             builder.Services.AddSignalR();
             builder.Services.AddEndpointsApiExplorer();
@@ -22,7 +23,7 @@ namespace Thesis_ASP
             builder.Services.AddControllers();
             builder.Services.AddSingleton<GameGroupManager>();
             builder.Services.AddDbContext<TCGDbContext>(options =>
-            options.UseMySql("Server=localhost;Port=3306;Database=egy_darab;User=lorxy;Password=lorand;",
+            options.UseMySql($"Server={dbHost};Port=3306;Database=egy_darab;User=lorxy;Password=lorand;",
             new MySqlServerVersion(new Version(10, 5, 9))
             ));
 

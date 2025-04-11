@@ -1,0 +1,50 @@
+version: '3.8'
+services:
+ 
+  db:
+    image: mariadb:lts-noble
+    ports: 
+      - 3306:3306
+    environment:
+       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+       MYSQL_USER: ${MYSQL_USER}
+       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+       MYSQL_DATABASE: egy_darab
+    volumes:
+        - ./db:/var/lib/mysql/
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "healthcheck.sh", "--connect", "--innodb_initialized" ]
+      start_period: 1m
+      start_interval: 10s
+      interval: 1m
+      timeout: 5s
+      retries: 3
+    networks:
+      - optcgsim_network
+  
+  backend:
+    tty: true
+    stdin_open: true
+    build:
+      dockerfile: Dockerfile
+      args:
+        - MYSQL_USER=${MYSQL_USER}
+        - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+        - DB_IP=${DB_IP}
+    ports:
+      - "5000:5000"
+
+    environment:
+      - ASPNETCORE_URLS=http://[..]:5000
+      - LOGGER_IP=${LOGGER_IP}
+      - DB_HOST=${DB_HOST}
+    restart: unless-stopped
+    depends_on:
+      migration:
+        condition: service_completed_successfully
+      mariadb:
+        condition: service_started
+
+    networks:
+      - optcgsim_network
