@@ -31,20 +31,13 @@ services:
       args:
         - MYSQL_USER=${MYSQL_USER}
         - MYSQL_PASSWORD=${MYSQL_PASSWORD}
-        - DB_IP=${DB_IP}
     ports:
       - "5000:5000"
 
     environment:
       - ASPNETCORE_URLS=http://[..]:5000
-      - LOGGER_IP=${LOGGER_IP}
       - DB_HOST=${DB_HOST}
     restart: unless-stopped
-    depends_on:
-      migration:
-        condition: service_completed_successfully
-      mariadb:
-        condition: service_started
 
     networks:
       - optcgsim_network
