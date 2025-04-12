@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.SignalR;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -17,10 +16,14 @@ using Thesis_ASP.Resources;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
+using Thesis_ASP.Data;
 
 namespace Thesis_ASP
 {
-    public class TCGDbContext : DbContext
+    public class TCGDbContext : IdentityDbContext<IdentityUser>
     {
         private readonly IHubContext<WebSocket> webSocket;
 
@@ -33,9 +36,12 @@ namespace Thesis_ASP
         
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Card>().ToTable("Cards");
-            modelBuilder.Entity<InGameCard>().ToTable("InGameCards");
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<Card>().ToTable("Cards").HasKey(k => k.id); ;
+            modelBuilder.Entity<InGameCard>().ToTable("InGameCards").HasKey(k => k.id);
         }
+
         public async Task AddCardsFromJSON()
         {
             if (!Cards.Any())

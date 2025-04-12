@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Thesis_ASP.Resources;
 
-namespace Thesis_ASP
+namespace Thesis_ASP.Data
 {
     public class InGameCard
     {

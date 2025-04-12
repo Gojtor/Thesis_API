@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,18 +18,46 @@ namespace Thesis_ASP
         {
             string dbHost = Environment.GetEnvironmentVariable("DB_HOST") ?? "localhost";
             var builder = WebApplication.CreateBuilder(args);
+
             builder.Services.AddSignalR();
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
             builder.Services.AddControllers();
             builder.Services.AddSingleton<GameGroupManager>();
+
             builder.Services.AddDbContext<TCGDbContext>(options =>
             options.UseMySql($"Server={dbHost};Port=3306;Database=egy_darab;User=lorxy;Password=lorand;",
             new MySqlServerVersion(new Version(10, 5, 9))
             ));
 
+            builder.Services.AddIdentity<IdentityUser, IdentityRole>()
+            .AddEntityFrameworkStores<TCGDbContext>()
+            .AddDefaultTokenProviders();
+
+            builder.Services.AddAuthentication()
+            .AddCookie(options =>
+            {
+                options.LoginPath = "/Account/Login";
+                options.LogoutPath = "/Account/Logout";
+            });
+            builder.Services.AddAuthorization();
+            builder.Services.AddControllersWithViews();
 
             var app = builder.Build();
+
+            using (var migration_scope = app.Services.CreateScope())
+            {
+                var db = migration_scope.ServiceProvider.GetRequiredService<TCGDbContext>();
+
+                try
+                {
+                    db.Database.Migrate();
+                }
+                catch (Exception ex)
+                {
+                    return;
+                }
+            }
 
             if (app.Environment.IsDevelopment())
             {
@@ -39,10 +68,15 @@ namespace Thesis_ASP
             await dbContext.DeleteAllCards();
             await dbContext.DeleteAllInGameCards();
             await dbContext.AddCardsFromJSON();     
+            
             app.UseSwagger();
             app.UseSwaggerUI();
-            app.MapControllers();
             app.UseRouting();
+
+            app.UseAuthentication();
+            app.UseAuthorization();
+
+            app.MapControllers();
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapHub<WebSocket>("/websocket");

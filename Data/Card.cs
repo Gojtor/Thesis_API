@@ -1,10 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Thesis_ASP.Resources;
 
-namespace Thesis_ASP
+namespace Thesis_ASP.Data
 {
     public class Card
     {
+        [Key]
+        public long id { get; set; }
         public string cardID { get; set; }
         public string cardName { get; set; }
         public string effect { get; set; }
@@ -17,7 +19,5 @@ namespace Thesis_ASP
         public Attributes attribute { get; set; }
         public Colors color { get; set; }
 
-        [Key]
-        public long id { get; set; }
     }
 }

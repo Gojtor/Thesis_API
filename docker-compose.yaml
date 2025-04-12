@@ -28,9 +28,6 @@ services:
     stdin_open: true
     build:
       dockerfile: Dockerfile
-      args:
-        - MYSQL_USER=${MYSQL_USER}
-        - MYSQL_PASSWORD=${MYSQL_PASSWORD}
     ports:
       - "5000:5000"
 
@@ -38,6 +35,12 @@ services:
       - ASPNETCORE_URLS=http://[..]:5000
       - DB_HOST=${DB_HOST}
     restart: unless-stopped
-
     networks:
       - optcgsim_network
+    depends_on:
+      db:
+        condition: service_healthy
+
+networks:
+  optcgsim_network:
+    driver: bridge
