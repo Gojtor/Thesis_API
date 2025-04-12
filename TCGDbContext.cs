@@ -33,6 +33,7 @@ namespace Thesis_ASP
         }
         public DbSet<Card> Cards { get; set; }
         public DbSet<InGameCard> InGameCards { get; set; }
+        public DbSet<User> Accounts { get; set; }
         
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

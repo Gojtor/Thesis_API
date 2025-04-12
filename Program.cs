@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.OpenApi.Models;
 using System;
 using System.Threading.Tasks;
+using Thesis_ASP.Data;
 
 namespace Thesis_ASP
 {
@@ -30,7 +31,7 @@ namespace Thesis_ASP
             new MySqlServerVersion(new Version(10, 5, 9))
             ));
 
-            builder.Services.AddIdentity<IdentityUser, IdentityRole>()
+            builder.Services.AddIdentity<User, IdentityRole>()
             .AddEntityFrameworkStores<TCGDbContext>()
             .AddDefaultTokenProviders();
 

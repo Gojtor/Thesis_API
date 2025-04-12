@@ -5,8 +5,7 @@ namespace Thesis_ASP.Data
 {
     public class User : IdentityUser
     {
-        [Key]
-        public long userID { get; set; }
+        public string DeckJson { get; set; } = string.Empty;
         public DateTime lastLoggedIn { get; set; }
         public DateTime registeredTimne { get; set; }
 

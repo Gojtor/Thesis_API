@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Thesis_ASP;
 
@@ -11,9 +12,11 @@ using Thesis_ASP;
 namespace Thesis_ASP.Migrations
 {
     [DbContext(typeof(TCGDbContext))]
-    partial class TCGDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250412162740_UserUpdateUpdate")]
+    partial class UserUpdateUpdate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
