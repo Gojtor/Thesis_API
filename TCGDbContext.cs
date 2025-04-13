@@ -34,7 +34,8 @@ namespace Thesis_ASP
         public DbSet<Card> Cards { get; set; }
         public DbSet<InGameCard> InGameCards { get; set; }
         public DbSet<User> Accounts { get; set; }
-        
+        public DbSet<Friendship> Friendships { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -115,7 +116,7 @@ namespace Thesis_ASP
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Erro while clearing database: {ex.Message}");
+                Console.WriteLine($"Error while clearing database: {ex.Message}");
             }
         }
 

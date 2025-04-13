@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using System.Reflection;
 using Thesis_ASP.Controllers.ViewModellsForControllers;
 using Thesis_ASP.Data;
 
@@ -14,11 +15,13 @@ namespace Thesis_ASP.Controllers
     {
         private readonly UserManager<User> userManager;
         private readonly SignInManager<User> signInManager;
+        private readonly TCGDbContext dbContext;
 
-        public AccountController(UserManager<User> userManager, SignInManager<User> signInManager)
+        public AccountController(TCGDbContext dbContext, UserManager<User> userManager, SignInManager<User> signInManager)
         {
             this.userManager = userManager;
             this.signInManager = signInManager;
+            this.dbContext = dbContext;
         }
 
         // Register endpoint
@@ -27,13 +30,15 @@ namespace Thesis_ASP.Controllers
         {
             if (ModelState.IsValid)
             {
+                List<string> newDeck = new List<string>();
+                newDeck.Add("ST01-DefaultDeck,1xST01-001,4xST01-002,4xST01-003,4xST01-004,4xST01-005,4xST01-006,4xST01-007,4xST01-008,4xST01-009,4xST01-010,2xST01-011,2xST01-012,2xST01-013,2xST01-014,2xST01-015,2xST01-016,2xST01-017");
                 var user = new User
                 {
                     UserName = model.UserName,
                     PasswordHash = model.Password,
                     lastLoggedIn = DateTime.UtcNow,
                     registeredTimne = DateTime.UtcNow,
-                    DeckJson = string.Empty
+                    DeckJson = JsonConvert.SerializeObject(newDeck)
                 };
                 var result = await userManager.CreateAsync(user, model.Password);
 
@@ -193,5 +198,128 @@ namespace Thesis_ASP.Controllers
 
             return BadRequest("Failed to update DeckJson.");
         }
+
+        public class FriendRequest
+        {
+            public string SenderName { get; set; }
+            public string ToUserName { get; set; }
+        }
+
+        [HttpPost("Friends/AddFriend")]
+        public async Task<IActionResult> SendFriendRequest([FromBody] FriendRequest request)
+        {
+            var senderUser = await userManager.FindByNameAsync(request.SenderName);
+            var toUser = await userManager.FindByNameAsync(request.ToUserName);
+
+            if (senderUser == null || toUser == null)
+            {
+                return NotFound("Users not found.");
+            }
+
+            var existing = await dbContext.Friendships.FirstOrDefaultAsync(f => (f.UserName == request.SenderName && f.FriendName == request.ToUserName)
+                                                                                || (f.UserName == request.ToUserName && f.FriendName == request.SenderName));
+            if (existing != null)
+                return BadRequest("Already friends or request pending.");
+
+            dbContext.Friendships.Add(new Friendship
+            {
+                UserName = request.SenderName,
+                FriendName = request.ToUserName,
+                IsAccepted = false
+            });
+            await dbContext.SaveChangesAsync();
+
+            return Ok("Friend request sent");
+
+        }
+
+        [HttpGet("Friends/GetFriends")]
+        public async Task<IActionResult> GetFriendsByUsername([FromQuery] string username)
+        {
+            var user = await userManager.FindByNameAsync(username);
+            if (user == null)
+                return NotFound("User not found.");
+
+            var friendships = await dbContext.Friendships.Where(f => (f.UserName == user.UserName || f.FriendName == user.UserName) && f.IsAccepted).ToListAsync();
+
+            var friendNames = friendships.Select(f => f.UserName == user.UserName ? f.FriendName : f.UserName).ToList();
+
+            var friendUsers = await userManager.Users.Where(u => friendNames.Contains(u.UserName)).Select(u => u.UserName).ToListAsync();
+
+            return Ok(friendUsers);
+        }
+
+        [HttpGet("Friends/GetFriendRequest")]
+        public async Task<IActionResult> GetFriendRequest([FromQuery] string username)
+        {
+            var user = await userManager.FindByNameAsync(username);
+            if (user == null)
+            {
+                return NotFound("User not found.");
+            }
+
+            var pendingRequests = await dbContext.Friendships.Where(f => f.FriendName == user.UserName && !f.IsAccepted).ToListAsync();
+
+            var senderUsernames = pendingRequests.Select(f => f.UserName).ToList();
+
+            var senderUsers = await userManager.Users.Where(u => senderUsernames.Contains(u.UserName)).Select(u => u.UserName).ToListAsync();
+
+            return Ok(senderUsers);
+        }
+
+        public class FriendAccept
+        {
+            public string SenderName { get; set; }
+            public string ToUserName { get; set; }
+        }
+
+        [HttpPost("Friends/AcceptFriendRequest")]
+        public async Task<IActionResult> AcceptFriendRequest([FromBody] FriendAccept req)
+        {
+            var fromUser = await userManager.FindByNameAsync(req.SenderName);
+            var toUser = await userManager.FindByNameAsync(req.ToUserName);
+
+            if (fromUser == null || toUser == null)
+            {
+                return NotFound("Users not found.");
+            }
+
+            var request = await dbContext.Friendships.FirstOrDefaultAsync(f => f.UserName == fromUser.UserName && f.FriendName == toUser.UserName && !f.IsAccepted);
+
+            if (request == null)
+            {
+                return NotFound("No friend request");
+            }
+
+            request.IsAccepted = true;
+            await dbContext.SaveChangesAsync();
+
+            return Ok("Friend request accepted");
+        }
+
+        [HttpPost("Friends/DeclineFriendRequest")]
+        public async Task<IActionResult> DeclineFriendRequest([FromBody] FriendAccept req)
+        {
+            var fromUser = await userManager.FindByNameAsync(req.SenderName);
+            var toUser = await userManager.FindByNameAsync(req.ToUserName);
+
+            if (fromUser == null || toUser == null)
+            {
+                return NotFound("Users not found.");
+            }
+
+            var request = await dbContext.Friendships.FirstOrDefaultAsync(f => f.UserName == fromUser.UserName && f.FriendName == toUser.UserName && !f.IsAccepted);
+
+            if (request == null)
+            {
+                return NotFound("No friend request");
+            }
+
+            dbContext.Friendships.Remove(request);
+            await dbContext.SaveChangesAsync();
+
+            return Ok("Friend request declined");
+        }
+
     }
 }

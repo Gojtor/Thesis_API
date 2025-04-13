@@ -9,5 +9,6 @@ namespace Thesis_ASP.Data
         public DateTime lastLoggedIn { get; set; }
         public DateTime registeredTimne { get; set; }
 
+        public ICollection<Friendship> Friends { get; set; }
     }
 }
