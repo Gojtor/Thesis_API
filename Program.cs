@@ -44,6 +44,20 @@ namespace Thesis_ASP
             builder.Services.AddAuthorization();
             builder.Services.AddControllersWithViews();
 
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowTrusted",
+                    builder =>
+                    {
+                        builder.WithOrigins("https://gojtor.github.io/Thesis-OPTCG/game/", "https://gojtor.github.io")
+                            .AllowAnyHeader()
+                            .AllowAnyMethod()
+                            .AllowCredentials()
+                            .SetIsOriginAllowedToAllowWildcardSubdomains()
+                            .WithExposedHeaders("Set-Cookie", "Content-Type", "Authorization", "X-Requested-With");
+                    });
+            });
+
             var app = builder.Build();
 
             using (var migration_scope = app.Services.CreateScope())
