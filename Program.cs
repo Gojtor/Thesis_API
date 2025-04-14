@@ -82,8 +82,10 @@ namespace Thesis_ASP
             var dbContext = scope.ServiceProvider.GetRequiredService<TCGDbContext>();
             await dbContext.DeleteAllCards();
             await dbContext.DeleteAllInGameCards();
-            await dbContext.AddCardsFromJSON();     
-            
+            await dbContext.AddCardsFromJSON();
+
+            app.UseCors("AllowTrusted");
+
             app.UseSwagger();
             app.UseSwaggerUI();
             app.UseRouting();
