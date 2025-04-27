@@ -29,7 +29,11 @@ public class TCGController : ControllerBase
     public async Task<IActionResult> GetCard(long id)
     {
         Card? card = await tcgDbContext.Cards.FindAsync(id);
-        if (card == null) { return NotFound(); }
+        if (card == null) {
+            logger.LogWarning($"Card couldn't be found with the given ID: {id}");
+            return NotFound(); 
+        }
+        logger.LogInformation($"Card found with the given ID: {card.cardName} (ID: {card.id})");
         return Ok(card);
     }
 
@@ -60,6 +64,7 @@ public class TCGController : ControllerBase
         };
         tcgDbContext.Cards.Add(card);
         await tcgDbContext.SaveChangesAsync();
+        logger.LogInformation($"New card added: {card.cardName} (CardID: {card.cardID})");
         return Ok(card);
     }
 
@@ -115,8 +120,12 @@ public class TCGController : ControllerBase
     [HttpGet("DeleteCardsFromGameDB")]
     public async Task<IActionResult> DeleteCardsFromGameDB()
     {
-        if (tcgDbContext.InGameCards == null) { return NotFound(); }
+        if (tcgDbContext.InGameCards == null) {
+            logger.LogWarning("InGameCards cannot be deleted because it is null.");
+            return NotFound(); 
+        }
         await tcgDbContext.DeleteAllInGameCards();
+        logger.LogInformation("Cards deleted from GameDB");
         return Ok("Cards deleted from GameDB");
     }
 
@@ -125,10 +134,10 @@ public class TCGController : ControllerBase
     {
         if (card == null)
         {
-            Console.WriteLine("Érvénytelen JSON adat!"); // Log konzolba
-            return BadRequest("Érvénytelen JSON adat!");
+            logger.LogError("Not valid JSON data");
+            return BadRequest("Not valid JSON data");
         }
-        Console.WriteLine($"Kapott kártya: {card.cardName} - ID: {card.cardID}");
+        logger.LogInformation($"New InGameCard created: {card.cardName} (CustomCardID: {card.customCardID})");
         tcgDbContext.InGameCards.Add(card);
         await tcgDbContext.SaveChangesAsync();
         return Ok(card);
@@ -184,6 +193,7 @@ public class TCGController : ControllerBase
             .SingleOrDefaultAsync();
         if (card == null)
         {
+            logger.LogWarning($"The card cannot be found in the database with these parameters: GameID: {updatedCard.gameCustomID}, Player: {updatedCard.playerName}, CustomCardID: {updatedCard.customCardID}");
             return NotFound();
         }
         card.cardID = updatedCard.cardID;
@@ -204,6 +214,7 @@ public class TCGController : ControllerBase
         card.gameCustomID = updatedCard.gameCustomID;
         card.currentParent = updatedCard.currentParent;
         await tcgDbContext.SaveChangesAsync();
+        logger.LogInformation($"Card updated: {card.cardName} (CustomCardID: {card.customCardID})");
         return Ok(card);
     }
 }
